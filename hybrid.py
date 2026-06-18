@@ -2,6 +2,7 @@ from vector_store import indexFaiss,searchFaiss
 from BM25 import BM_idx,search_BM
 from embedder import embeddings_user
 from itertools import chain
+from chunker import slidingWindow
 def Rank(text):
     query=text.split(" ")
     idx_fias,key_x,embeddings=indexFaiss()
@@ -22,12 +23,25 @@ def Rank(text):
     all_positions = set(faiss_rank.keys()) | set(BM_rank.keys())
     k=60
     default=len(key_x)
+    chk=10
     for pos in all_positions:
-        score[pos]=1/(k+faiss_rank.get(pos,default))+1/(k+BM_idx.get(pos,default))
+        score[pos]=1/(k+faiss_rank.get(pos,default))+1/(k+BM_rank.get(pos,default))
+    top=sorted(score,key=score.get,reverse=True)[:chk]
+    top_keys=[key_x[pos] for pos in top]
     
+    top_n = 10
+    faiss_keys = set(key_x[p] for p in I[:10])
+    bm25_keys = set(key_x[p] for p in rnk_BM[:10])
+    agreement = len(faiss_keys & bm25_keys) / 10
+   
+    return top_keys,agreement
+
 def main():
     text=input("Enter Your text here ")
-    Rank(text)
+    top_keys,agreement=Rank(text)
+    # print(top_keys)
+    print(agreement)
+    
 
 if __name__=="__main__":
     main()
