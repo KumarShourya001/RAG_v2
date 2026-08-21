@@ -45,7 +45,7 @@ def result(text):
 
 def main(): 
     text=input("Give your inital sentence ")
-    rnk_keys=result(text)
+    rnk_keys, agreement = result(text)
     s=""
     emb_dict = slidingWindow()
     for key in rnk_keys:
